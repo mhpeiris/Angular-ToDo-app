@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="lab4.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+		<script>
+			//var results = "testing";
+			function handleFileSelect(evt) {
+				var display = document.getElementById("disp");
+				evt.stopPropagation();
+				evt.preventDefault();
+				
+				var files = evt.dataTransfer.files; 
+
+				var textType = 'application/json';
+				    for (var i = 0, f; f = files[i]; i++) {
+					if (f.type.match("application/json")) {
+					
+					var reader = new FileReader();
+						reader.onload = function(e)
+						{
+							var results = e.target.result;
+							//display.innerHTML = results;
+							var scope = angular.element(document.getElementById("MainWrap")).scope();
+							scope.$apply(function() {
+								scope.reload(results);
+							});
+						}
+						reader.readAsText(f);
+						
+					}
+					else
+					{
+						display.innerText = "File Not Available!";
+					}					
+				}
+			}
+
+			function handleDragOver(evt) {
+				evt.stopPropagation();
+				evt.preventDefault();
+				evt.dataTransfer.dropEffect = 'copy'; 
+			}
+			
+			var app = angular.module('myTodo', []);
+			app.controller('taskCtrl', function($scope, $http, $filter) {
+				
+				$scope.myTasks = [];
+				$scope.checked = [];
+				
+				$http.get("todo.json").then(function (response) {
+					$scope.myData = response.data.todo;
+					//$scope.myTasks = $scope.myData;
+					var z;
+					for(z = 0; z<$scope.myData.length; z++)
+					{
+						if(!$scope.myData[z].complete)
+						{
+							$scope.myTasks.push({"task":$scope.myData[z].task,"complete":false, "description":$scope.myData[z].description});
+						}
+						else
+						{
+							$scope.checked.push({"task": $scope.myData[z].task,
+										"description": $scope.myData[z].description
+										});
+						}
+					}
+					var i, j, k, l, a;
+					
+				});
+				
+				$scope.temp = [];
+				
+				$scope.addTask = function()
+				{ 	
+					
+					for(i=0; i<$scope.myTasks.length; i++)
+					{
+						$scope.temp.push($scope.myTasks[i].task);
+					}
+					$scope.errortext = "";
+					if(!$scope.moreTask){return;}
+					
+					//if($scope.myData.indexOf($scope.moreTask) == -1){
+					if($scope.temp.indexOf($scope.moreTask) == -1)
+					{
+						$scope.myTasks.push({"task":$scope.moreTask,"complete":false, "description":$scope.moreDisc});
+						$scope.myData = $scope.myTasks;
+					}
+					else
+					{
+						$scope.errortext = "This task already exists";
+						window.alert("Duplication error: This task already exists!");
+					}
+					$scope.temp = [];
+				};
+				$scope.removeTask = function(remove)
+				{
+					$scope.myTasks.splice(remove, 1);
+					$scope.myData = $scope.myTasks;
+				};
+				
+				$scope.checkMark = function(checked,task)
+				{
+						
+					$scope.myTasks.splice(checked, 1);
+					$scope.checked.push({"task": task.task,
+										"description": task.description
+					});
+					$scope.myData = $scope.myTasks;
+				};
+				
+				$scope.reload = function(results)
+				{
+					$scope.myString = results;
+					$scope.myJson = $scope.$eval($scope.myString);
+					$scope.temp = [];
+					for(j=0; j<$scope.myTasks.length; j++)
+					{
+						$scope.temp.push($scope.myTasks[j].task);
+					}
+										
+					for(k=0; k<$scope.myJson.todo.length; k++)
+					{
+						$scope.tempChecked = [];
+						if($scope.temp.indexOf($scope.myJson.todo[k].task) == -1)
+						{
+							if($scope.myJson.todo[k].complete==false)
+							{
+								$scope.myTasks.push({"task":$scope.myJson.todo[k].task, "complete":false, "description":$scope.myJson.todo[k].description});
+							}
+							else
+							{
+								//if($scope.checked[k].task)
+								$scope.checked.push({"task": $scope.myJson.todo[k].task,
+										"description": $scope.myJson.todo[k].description
+										});
+							}
+						}
+						else
+						{
+							$scope.errortext = "This task already exists";
+							window.alert("Duplication error: This task already exists!");
+						}
+					}
+					
+				};
+					
+			});
+		</script>
+	</head>
+	<body>
+		<div id="drop_zone">Drop Input Files Here</div>
+		<div id="MainWrap" ng-app="myTodo" ng-controller="taskCtrl">
+			<div class="row">
+				<div class="col-2 col-m-m-2"></div>
+				<div class="col-8 col-m-m-8">
+					<input ng-model="moreTask" placeholder="Task Name" class="text-transformer"> <input ng-model="moreDisc" placeholder="Description" size="40" class="text-transformer">
+					<button ng-click="addTask()">Add Task</button>
+				</div>
+				<div class="col-2 col-m-m-2"></div>
+			</div>
+			<div>
+				<div ng-include="'myDisp.html'"></div>
+				<!--<div >{{temp.toString()}}</div>-->
+				<!--<div>{{myJson.todo[0].task}}</div>-->
+			</div>
+		</div> 
+		<div id="disp"></div>
+		<script>
+		  var dropZone = document.getElementById('drop_zone');
+		  dropZone.addEventListener('dragover', handleDragOver, false);
+		  dropZone.addEventListener('drop', handleFileSelect, false);
+		</script>
+		<footer>
+			<p>Mahathelge Hareen Peiris, 500552563</p>
+		</footer>
+	</body>
+</html>

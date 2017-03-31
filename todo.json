@@ -1,0 +1,19 @@
+{
+	"todo":[
+		{
+			"task":"Task 1",
+			"complete":false,
+			"description":"Some task"
+		},
+		{
+			"task":"Task 2",
+			"complete":true,
+			"description":"Task is not done yet"
+		},
+		{
+			"task":"Test Task",
+			"complete": false,
+			"description":"Task is finished. Test is successful"
+		}
+		]
+}

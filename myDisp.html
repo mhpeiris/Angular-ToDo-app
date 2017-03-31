@@ -1,0 +1,29 @@
+<div class="row text-transformer" id="upperA">
+	<div class="strng"><h3>IN PROGRESS TASKS</h3></div>
+	<div ng-repeat="x in myTasks"  class="col-12 col-m-m-12">
+	<table style="width:66%" height="100" align="center">
+		<tr>
+			<td width="60%">{{x.task}}</td>
+	 		<td class="removeMark" ng-click="removeTask($index)">&#10008;</td>
+			<td ng-click="checkMark($index,x)" id="check">&#10004;</td>
+		</tr>
+		<tr>
+			<td colspan="3">{{x.description}}</td>
+		</tr>
+	</table>
+</div>
+</div>
+<div class="row text-transformer">
+	<div  class="col-6 col-m-m-6"><div style="color:#343434;">COMPLETED TASKS</div><br><br>
+	<div ng-repeat="check in checked" class="upperB">
+		<div >
+		<table style="width:100%" height="100">
+			<tr>
+				<td width="38%">{{check.task.toString()}}</td>
+				<td >{{check.description.toString()}}</td>
+			</tr>
+		</table>
+			</div>
+	</div>
+</div>
+</div>
